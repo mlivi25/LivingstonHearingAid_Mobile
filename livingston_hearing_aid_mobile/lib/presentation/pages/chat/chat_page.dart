@@ -18,6 +18,11 @@ class _ChatPageState extends State<ChatPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Builder(builder: (context) {
+              final state = context.watch<ChatroomBloc>().state;
+
+              return Text('${state.status.toString()}');
+            }),
             Container(
               child: Text('Chat Page'),
             ),
@@ -27,8 +32,10 @@ class _ChatPageState extends State<ChatPage> {
                     child: Text('Sign Out', style: TextStyle(fontSize: 30)),
                     onPressed: () {
                       if (context.read<AuthenticationBloc>().state
-                          is Authenticated)
+                          is Authenticated) {
+                        context.read<ChatroomBloc>().add(EndChatroom());
                         context.read<AuthenticationBloc>().add(LogOutCommand());
+                      }
                     })),
             BlocBuilder<ChatroomBloc, ChatroomState>(
               builder: (context, state) {

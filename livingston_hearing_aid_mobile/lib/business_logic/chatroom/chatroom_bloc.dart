@@ -15,9 +15,12 @@ class ChatroomBloc extends Bloc<ChatroomEvent, ChatroomState> {
   final IChatRepository chatRepository;
   StreamSubscription _messageSubscription;
 
+  // StreamConsumer _messageConsumer;  Reusable??
+
   @override
   Future<void> close() {
     _messageSubscription?.cancel();
+
     return super.close();
   }
 
@@ -26,12 +29,11 @@ class ChatroomBloc extends Bloc<ChatroomEvent, ChatroomState> {
     ChatroomEvent event,
   ) async* {
     if (event is StartChatroomCommand) {
-      // _messageController.sink.addStream(chatRepository.initializeRoom());
-      // _messageController.addStream(chatRepository.initializeRoom());
-
+      await _messageSubscription?.cancel();
       _messageSubscription = chatRepository.initializeRoom().listen((event) {
         add(MessageUpdateEvent(event));
       });
+
       if (state.status == ChatroomStatus.offline)
         yield state.copyWith(status: ChatroomStatus.online);
     } else if (event is MessageUpdateEvent) {
@@ -40,8 +42,10 @@ class ChatroomBloc extends Bloc<ChatroomEvent, ChatroomState> {
       yield state.copyWith(messages: currentList);
     } else if (event is SendMessageCommand) {
       chatRepository.addMessage(event.message);
-    } else if (event is EndChatroom)
+    } else if (event is EndChatroom) {
+      _messageSubscription?.cancel();
       yield state.copyWith(status: ChatroomStatus.offline);
+    }
   }
 }
 
