@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "836191872583",
+    "project_id": "livingston-hearing-aid-mobile",
+    "storage_bucket": "livingston-hearing-aid-mobile.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:836191872583:android:cbc8df1b49258582337362",
+        "android_client_info": {
+          "package_name": "com.example.livingston_hearing_aid_mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "836191872583-84n2p9qml752qna3d1gct2t4u4n02b17.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.livingston_hearing_aid_mobile",
+            "certificate_hash": "43dc53d06ab1600d881cdb9674076aedfc760b52"
+          }
+        },
+        {
+          "client_id": "836191872583-j6fnunp0iom70r1l309ao6k4nkpdbp0k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvE6fFokRsotrOlcv8Ymmyga1Yfnuny2A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "836191872583-j6fnunp0iom70r1l309ao6k4nkpdbp0k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
