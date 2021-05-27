@@ -9,16 +9,17 @@ class ChatroomState extends Equatable {
 
   ChatroomState copyWith({List<String> messages, ChatroomStatus status}) {
     return new ChatroomState(
-        messages: messages ?? this.messages, status: status ?? this.status);
+        messages: messages ?? this.messages.toList(),
+        status: status ?? this.status);
   }
 
   @override
   List<Object> get props => [messages, status];
 
-  // @override
-  // String toString() {
-  //   return '${status.toString()} ${messages.toString()}';
-  // }
+  @override
+  String toString() {
+    return '${status.toString()} ${messages.toString()}';
+  }
 }
 
 enum ChatroomStatus { online, offline }
