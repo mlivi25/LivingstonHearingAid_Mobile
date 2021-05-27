@@ -22,7 +22,7 @@ wss.on("connection", function connection(ws) {
     wss.clients.forEach(function each(client) {
       if (client !== ws && client.readyState === WebSocket.OPEN) {
         //sends message to other connected clients
-        client.send(message);
+        client.send(message + " " + clientInformation);
       }
       client.send(message); //Includes the client who sent the message
     });

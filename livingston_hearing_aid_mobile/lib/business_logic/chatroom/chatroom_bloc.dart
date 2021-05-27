@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:web_socket_channel/io.dart';
 
 part 'chatroom_event.dart';
@@ -15,12 +16,9 @@ class ChatroomBloc extends Bloc<ChatroomEvent, ChatroomState> {
   final IChatRepository chatRepository;
   StreamSubscription _messageSubscription;
 
-  // StreamConsumer _messageConsumer;  Reusable??
-
   @override
   Future<void> close() {
     _messageSubscription?.cancel();
-
     return super.close();
   }
 
@@ -43,7 +41,9 @@ class ChatroomBloc extends Bloc<ChatroomEvent, ChatroomState> {
     } else if (event is SendMessageCommand) {
       chatRepository.addMessage(event.message);
     } else if (event is EndChatroom) {
-      _messageSubscription?.cancel();
+      await chatRepository.cancelStream();
+      await _messageSubscription?.cancel();
+
       yield state.copyWith(status: ChatroomStatus.offline);
     }
   }
@@ -55,13 +55,21 @@ abstract class IChatRepository {
   Stream initializeRoom();
 
   void addMessage(String message);
+
+  Future cancelStream();
 }
 
 // WHEN workign with HTTP or Websockets see this config
 //https://stackoverflow.com/questions/64197752/bad-state-insecure-http-is-not-allowed-by-platform/65578828
 
-class ChatRepository extends IChatRepository {
-  final channel = IOWebSocketChannel.connect(Uri.parse('ws://10.0.2.2:3000'));
+class ChatRepository extends Disposable implements IChatRepository {
+  IOWebSocketChannel channel;
+
+  ChatRepository() {
+    _messageController = StreamController.broadcast();
+  }
+
+  StreamController _messageController;
 
   @override
   Future<String> initializeChat({String chatRoomName, String userId}) {
@@ -69,11 +77,23 @@ class ChatRepository extends IChatRepository {
   }
 
   @override
+  cancelStream() async {
+    await channel.sink.close();
+  }
+
+  @override
   Stream initializeRoom() {
-    return channel.stream;
+    channel = IOWebSocketChannel.connect(Uri.parse('ws://10.0.2.2:3000'));
+
+    return channel.stream.asBroadcastStream();
   }
 
   void addMessage(String message) async {
     channel.sink.add(message);
+  }
+
+  @override
+  FutureOr onDispose() {
+    _messageController.close();
   }
 }

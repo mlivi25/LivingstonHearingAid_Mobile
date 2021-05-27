@@ -13,7 +13,7 @@ void main() {
 
     setUp(() {
       mockChatRepo = MockChatRepo();
-      _messageStreamController = new StreamController();
+      _messageStreamController = StreamController();
 
       when(mockChatRepo.initializeRoom())
           .thenAnswer((_) => _messageStreamController.stream);
@@ -23,9 +23,8 @@ void main() {
               userId: anyNamed('userId')))
           .thenAnswer((_) => Future.value("Response"));
 
-      when(mockChatRepo.addMessage(argThat(isA<String>())))
-          .thenAnswer((realInvocation) {
-        _messageStreamController.sink.add("Test Message");
+      when(mockChatRepo.addMessage(argThat(isA<String>()))).thenAnswer((_) {
+        _messageStreamController.add("Test Message");
       });
 
       sut = new ChatroomBloc(chatRepository: mockChatRepo);
@@ -73,6 +72,21 @@ void main() {
               ChatroomState(messages: [], status: ChatroomStatus.online),
               ChatroomState(
                   messages: ["Test Message"], status: ChatroomStatus.online)
+            ]);
+
+    blocTest('Unsubscribe resubscribe',
+        build: () => sut,
+        act: (sut) async {
+          sut.add(StartChatroomCommand());
+          sut.add(SendMessageCommand('message'));
+          sut.add(EndChatroom());
+        },
+        wait: const Duration(milliseconds: 500),
+        expect: () => [
+              ChatroomState(messages: [], status: ChatroomStatus.online),
+              ChatroomState(messages: [], status: ChatroomStatus.offline),
+              ChatroomState(
+                  messages: ["Test Message"], status: ChatroomStatus.offline)
             ]);
   });
 }
